@@ -11,29 +11,18 @@
     <h2>Poochs: <span id="poochs">0</span></h2>
 
     <div id="poochContainer">
-
         <img src="https://github.com/therealpoocher/poochclicker/blob/main/Pooch.png?raw=true" id="pooch">
-    
     </div>
-    
+
     <div class="top-bar">
         <button onclick="toggleMute()" id="muteBtn">Mute</button>
         <button onclick="resetGame()">Reset</button>
     </div>
-    <div class="shop">
-        <h3>Shop</h3>
-        <button onclick="buyTreat()">
-            Dog Treat (+1 per click)
-            Cost: <span id="treatCost">10</span>
-        </button>
 
-        <button onclick="buyFan()">
-            Poochling (+1 per second)
-            Poochlings: <span id="fanCost">50</span>
-        </button>
-    </div>
+    <div class="shop" id="shop"></div>
+    <audio id="rageSound" src="sounds/PoochRageAudio.mp3" preload="auto"></audio>
     <audio id="barkSound" src="sounds/bark.mp3" preload="auto"></audio>
-    <script src="script.js"></script>
 
+    <script src="script.js"></script>
 </body>
 </html>
