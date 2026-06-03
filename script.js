@@ -100,7 +100,7 @@ function updateOrbiters() {
     
     for (let i = 0; i < poochsPerSecond; i++) {
         const img = document.createElement("img");
-        img.src="https://github.com/therealpoocher/poochclicker/blob/main/Pooch.png?raw=true"
+        img.src="https://github.com/therealpoocher/poochclicker/blob/main/ezgif-1128212db36590e7.gif?raw=true"
         img.className = "orbit-pooch";
     
         container.appendChild(img);
