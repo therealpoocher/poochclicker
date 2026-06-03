@@ -206,7 +206,7 @@ function buyFan() {
 function spawnGoldenPooch() {
     const pooch = document.createElement("img");
 
-    pooch.src = "images/pooch.png";
+    pooch.src = "https://github.com/therealpoocher/poochclicker/blob/main/Pooch.png?raw=true";
     pooch.className = "golden-pooch";
 
     const x = Math.random() * (window.innerWidth - 80);
