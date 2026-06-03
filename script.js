@@ -190,16 +190,16 @@ document.getElementById("pooch").addEventListener("click", (e) => {
 
     clickCount++;
 
-    // RAGE START
-if (!muted && barkSound) {
-    try {
-        barkSound.currentTime = 0;
-        barkSound.volume = 0.25;
-        barkSound.play().catch(() => {});
-    } catch (e) {
-        console.log("Bark sound failed:", e);
-    }
+if (barkSound && !muted) {
+    barkSound.pause();
+    barkSound.currentTime = 0;
+
+    barkSound.play().catch(err => {
+        console.log("Bark blocked:", err);
+    });
 }
+    // RAGE START
+
 
     if (rageActive) gain *= 1 + (window.rageUnlocked * 2);
 
