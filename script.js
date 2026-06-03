@@ -3,9 +3,6 @@ let clickPower = 1;
 let muted = false;
 
 let clickCount = 0;
-let rageActive = false;
-let rageTimer = 0;
-let rageCooldown = 300; // 5 minutes = 300 seconds
 let angle = 0;
 let pokeIndex = 0;
 let pokeVelocity = [];
@@ -17,8 +14,13 @@ let allowSave = true;
 const poochEl = document.getElementById("pooch");
 
 const normalPoochImg = "https://github.com/therealpoocher/poochclicker/blob/main/Pooch.png?raw=true";
-const ragePoochImg = "https://raw.githubusercontent.com/therealpoocher/poochclicker/refs/heads/main/RagePooch.png";
-const rageSound = document.getElementById("rageSound");
+const goldenPoochImg = "https://github.com/therealpoocher/poochclicker/blob/main/images/GoldenPooch.png?raw=true";
+
+let goldenBuffActive = false;
+let goldenBuffTimer = 0;
+
+let clickMultiplier = 1;
+let ppsMultiplier = 1;
 /* ---------------- UPGRADES ---------------- */
 
 const upgrades = [
@@ -28,7 +30,7 @@ const upgrades = [
         desc: "+1 click power",
         cost: 10,
         owned: 0,
-        scale: (lvl) => Math.floor(10 * Math.pow(1.5, lvl)),
+        scale: (lvl) => Math.floor(10 * Math.pow(1.2, lvl)),
         buy: () => clickPower += 1
     },
     {
@@ -37,47 +39,121 @@ const upgrades = [
         desc: "+1 per second",
         cost: 50,
         owned: 0,
-        scale: (lvl) => Math.floor(50 * Math.pow(1.8, lvl)),
+        scale: (lvl) => Math.floor(50 * Math.pow(1.2, lvl)),
         buy: () => updateOrbiters()
-    },
-    {
-        id: "critbark",
-        name: "Critical Bark",
-        desc: "10% chance x3 clicks",
-        cost: 500,
-        owned: 0,
-        scale: (lvl) => Math.floor(500 * Math.pow(2, lvl)),
-        buy: () => {
-            window.critChance = Math.min(0.6, (window.critChance || 0) + 0.05);
-        }
-    },
-    {
-        id: "ragemode",
-        name: "Rage Mode",
-        desc: "Every 5 minutes triggers x5 power for 5s",
-        cost: 800,
-        owned: 0,
-        scale: (lvl) => Math.floor(800 * Math.pow(2, lvl)),
-        buy: () => {
-            window.rageUnlocked = (window.rageUnlocked || 0) + 1;
-        }
     }
 ];
+function activateGoldenBuff() {
+    if (goldenBuffActive) return;
 
+    goldenBuffActive = true;
+    goldenBuffTimer = 60;
+
+    clickMultiplier = 1;
+    ppsMultiplier = 1;
+
+    const buffs = [
+        {
+            text: "🟡 x777 Click Power",
+            apply: () => clickMultiplier = 777
+        },
+        {
+            text: "🟡 x7 Poochling Power",
+            apply: () => ppsMultiplier = 7
+        },
+        {
+            text: "🟡 x77 Click + x3 PPS",
+            apply: () => {
+                clickMultiplier = 77;
+                ppsMultiplier = 3;
+            }
+        },
+        {
+            text: "🟡 x25 Everything",
+            apply: () => {
+                clickMultiplier = 25;
+                ppsMultiplier = 25;
+            }
+        }
+    ];
+
+    const buff = buffs[Math.floor(Math.random() * buffs.length)];
+
+    buff.apply();
+
+    poochEl.src = goldenPoochImg;
+    poochEl.style.filter = "drop-shadow(0 0 25px gold)";
+    poochEl.style.transform = "scale(1.08)";
+
+    spawnBoostText(buff.text);
+}
+function spawnGoldenPooch() {
+    if (document.querySelector(".golden-pooch")) return;
+    if (goldenBuffActive) return;
+
+    const pooch = document.createElement("img");
+
+    pooch.src = goldenPoochImg;
+    pooch.className = "golden-pooch";
+    pooch.style.transform = "scale(1.15)";
+    pooch.title = "Golden Pooch!";
+    pooch.style.filter =
+    "drop-shadow(0 0 20px gold)";
+    pooch.style.left =
+        Math.random() * (window.innerWidth - 80) + "px";
+
+    pooch.style.top =
+        Math.random() * (window.innerHeight - 80) + "px";
+        
+    pooch.onclick = () => {
+        activateGoldenBuff();
+        pooch.remove();
+    };
+
+    document.body.appendChild(pooch);
+    pooch.className = "golden-pooch";
+    setTimeout(() => {
+        if (pooch.parentNode) {
+            pooch.remove();
+        }
+    }, 15000);
+}
+function spawnBoostText(msg) {
+    const el = document.createElement("div");
+    el.className = "floating-pooch";
+    el.textContent = msg;
+
+    el.style.position = "fixed";
+    el.style.left = "50%";
+    el.style.top = "100px";
+    el.style.transform = "translateX(-50%)";
+    el.style.fontSize = "24px";
+    el.style.fontWeight = "bold";
+    el.style.color = "gold";
+    el.style.zIndex = "9999";
+
+    document.body.appendChild(el);
+
+    setTimeout(() => el.remove(), 2500);
+}
 /* ---------------- SOURCE OF TRUTH ---------------- */
 
 function getPPS() {
     return upgrades.find(u => u.id === "fan").owned || 0;
 }
 
-/* ---------------- FLOATING TEXT SAFETY ---------------- */
+/* ---------------- FLOATING TEXT ---------------- */
 
-function spawnBoostText(msg) {
-    const el = document.createElement("div");
-    el.className = "floating-pooch";
-    el.textContent = msg;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 1000);
+function spawnFloatingText(x, y, amt) {
+    const pop = document.createElement("div");
+    pop.className = "floating-pooch";
+    pop.innerHTML = `<span>+${amt}</span>`;
+    pop.style.left = x + "px";
+    pop.style.top = y + "px";
+    pop.style.transform = "translate(-50%, -50%)";
+    pop.style.pointerEvents = "none";
+    document.body.appendChild(pop);
+    setTimeout(() => pop.remove(), 1000);
 }
 
 /* ---------------- SAVE ---------------- */
@@ -95,6 +171,8 @@ function saveGame() {
         }))
     }));
 }
+
+/* ---------------- LOAD ---------------- */
 
 function loadGame() {
     const save = JSON.parse(localStorage.getItem("poochclicker"));
@@ -127,6 +205,7 @@ function resetGame() {
 
     upgrades.forEach(u => {
         u.owned = 0;
+
         if (u.id === "treat") u.cost = 10;
         if (u.id === "fan") u.cost = 50;
     });
@@ -186,48 +265,13 @@ function buyUpgrade(i) {
 /* ---------------- CLICK ---------------- */
 
 document.getElementById("pooch").addEventListener("click", (e) => {
-    let gain = clickPower;
-
-    clickCount++;
-
-if (barkSound && !muted) {
-    barkSound.pause();
-    barkSound.currentTime = 0;
-
-    barkSound.play().catch(err => {
-        console.log("Bark blocked:", err);
-    });
-}
-    // RAGE START
-
-
-    if (rageActive) gain *= 1 + (window.rageUnlocked * 2);
-
-    // CRIT
-    if (Math.random() < (window.critChance || 0)) {
-        gain *= 3;
-        spawnBoostText("CRIT BARK!");
-    }
+    let gain = clickPower * clickMultiplier;
 
     poochs += gain;
     updateUI();
 
     spawnFloatingText(e.clientX, e.clientY, gain);
 });
-
-/* ---------------- FLOATING CLICK ---------------- */
-
-function spawnFloatingText(x, y, amt) {
-    const pop = document.createElement("div");
-    pop.className = "floating-pooch";
-    pop.innerHTML = `<span>+${amt}</span>`;
-    pop.style.left = x + "px";
-    pop.style.top = y + "px";
-    pop.style.transform = "translate(-50%, -50%)";
-    pop.style.pointerEvents = "none";
-    document.body.appendChild(pop);
-    setTimeout(() => pop.remove(), 1000);
-}
 
 /* ---------------- ORBIT ---------------- */
 
@@ -310,48 +354,42 @@ function pokePoochlings() {
 /* ---------------- GAME LOOP ---------------- */
 
 setInterval(() => {
-    poochs += getPPS();
+    poochs += getPPS() * ppsMultiplier;
 
     if (getPPS() > 0) pokePoochlings();
 
     updateUI();
 }, 1000);
-
-/* ---------------- RAGE TIMER ---------------- */
+/* ---------------- GOLDEN BUFF TIMER ---------------- */
 
 setInterval(() => {
-    if (!window.rageUnlocked) return;
+    if (!goldenBuffActive) return;
 
-    rageCooldown--;
+    goldenBuffTimer--;
 
-    if (rageCooldown <= 0 && !rageActive) {
-        rageActive = true;
-        rageTimer = 5;
-        rageCooldown = 300; // reset cooldown
+    if (goldenBuffTimer <= 0) {
+        goldenBuffActive = false;
 
-        poochEl.src = ragePoochImg;
-        spawnBoostText("RAGE MODE!");
-        rageSound.currentTime = 0;
-        rageSound.volume = 0.5;
-        rageSound.play();
-        poochEl.style.filter = `drop-shadow(0 0 ${5 + (window.rageUnlocked * 3)}px red)`;
-        poochEl.style.transform = "scale(1.1)";
-    }
+        clickMultiplier = 1;
+        ppsMultiplier = 1;
 
-    if (rageActive) {
-        rageTimer--;
+        poochEl.src = normalPoochImg;
+        poochEl.style.filter = "";
+        poochEl.style.transform = "";
 
-        if (rageTimer <= 0) {
-            rageActive = false;
-            poochEl.src = normalPoochImg;
-            poochEl.style.filter = "none";
-            poochEl.style.transform = "scale(1)";
-        }
+        spawnBoostText("Golden Pooch Left!");
     }
 }, 1000);
-
 /* ---------------- START ---------------- */
+setInterval(() => {
+    if (goldenBuffActive) return;
 
+    if (document.querySelector(".golden-pooch")) return;
+
+    if (Math.random() < 0.08) {
+        spawnGoldenPooch();
+    }
+}, 1000);
 loadGame();
 updateUI();
 renderShop();
