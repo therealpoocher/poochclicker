@@ -1,0 +1,104 @@
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    background: #FFAD19;
+}
+.top-bar {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.top-bar button {
+    padding: 6px 10px;
+    background: #2a2a2a;
+    color: white;
+    border: 1px solid #444;
+    cursor: pointer;
+}
+#pooch {
+    width: 250px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+#pooch:active {
+    transform: scale(0.95);
+}
+
+.shop {
+    margin-top: 30px;
+}
+
+button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px;
+}
+.floating-pooch {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+    animation: rise 1s ease-out forwards;
+    font-weight: bold;
+    font-size: 18px;
+    color: white;
+    text-shadow:
+        -2px -2px 0 #000,
+         2px -2px 0 #000,
+        -2px  2px 0 #000,
+         2px  2px 0 #000,
+         0px  -2px 0 #000,
+         0px   2px 0 #000,
+        -2px  0px 0 #000,
+         2px  0px 0 #000;
+}
+
+.floating-pooch img {
+    width: 30px;
+    height: 30px;
+}
+#poochContainer {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 40px auto;
+}
+
+.orbit-pooch {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+}
+
+.golden-pooch {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    z-index: 9999;
+    animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+    from { filter: brightness(1); transform: scale(1); }
+    to { filter: brightness(1.8) drop-shadow(0 0 10px gold); transform: scale(1.1); }
+}
+.floating-pooch {
+    text-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+@keyframes rise {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-80px);
+        opacity: 0;
+    }
+}
